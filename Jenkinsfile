@@ -15,7 +15,8 @@ docker version'''
     }
     stage('deploy') {
       steps {
-        sh 'echo "docker tag..."'
+        sh '''docker tag fileupload-webapp:latest 780245226102.dkr.ecr.us-west-2.amazonaws.com/fileupload-webapp:latest
+docker push 780245226102.dkr.ecr.us-west-2.amazonaws.com/fileupload-webapp:latest'''
       }
     }
   }
