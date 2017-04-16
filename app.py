@@ -46,7 +46,7 @@ if len(sys.argv) == 2:
   UPLOAD_FOLDER = sys.argv[1];
 else:
   homedir = getHomeDir();
-  UPLOAD_FOLDER = homedir + "/parzee-files"
+  UPLOAD_FOLDER = homedir + "/files"
 
 
 app = Flask(__name__, static_url_path='')
