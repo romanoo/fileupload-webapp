@@ -1,5 +1,4 @@
 # fileupload-webapp
-Software Internship Project for Parzee Cloud Services
 
 * A web application to upload customer data files and deployed the web app work run on Amazon Web Services (AWS) Elastic Compute Cloud (EC2) using JQuery-JavaScript/Bootstrap on the front-end and Python/Flask on the back-end.
 * Stored the uploaded customer data to the scalable Amazon S3 Cloud Storage.
