@@ -11,7 +11,7 @@ echo "latest commit is $(cat latest_commit)"'''
     }
     stage('build') {
       steps {
-        sh '''latest commit=$(cat latest_commit)
+        sh '''latest_commit=$(cat latest_commit)
 echo "last commit is ${last_commit}"
 
 registry_url="780245226102.dkr.ecr.us-west-2.amazonaws.com"
