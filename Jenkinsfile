@@ -55,10 +55,10 @@ EOF
 aws ecs register-task-definition --cli-input-json "$(cat task-def.json)"
 
 # find the revision just created
-task_definition=$(aws ecs list-task-definitions | jq '.taskDefinitionArns[-1]')
+task_definition=$(aws ecs list-task-definitions | jq '.taskDefinitionArns[-1]' | sed -e s@'^"'@@g -e s@'"$'@@g)
 
 # find the service name for fileupload-service
-service_name=$(aws ecs list-services | jq '.serviceArns[] | select(contains("fileupload-service"))')
+service_name=$(aws ecs list-services | jq '.serviceArns[] | select(contains("fileupload-service"))' | sed -e s@'^"'@@g -e s@'"$'@@g)
 
 # update the service to use the new revision of the task definition
 aws ecs update-service --service ${service_name} --task-definition ${task_definition}'''
