@@ -52,7 +52,7 @@ cat << EOF > task-def.json
 }
 EOF
 
-aws ecs register-task-definition --cli-input-json < task-def.json
+aws ecs register-task-definition --cli-input-json "$(cat task-def.json)"
 
 # find the revision just created
 task_definition=$(aws ecs list-task-definitions | jq '.taskDefinitionArns[-1]')
