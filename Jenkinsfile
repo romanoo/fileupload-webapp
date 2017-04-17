@@ -30,7 +30,7 @@ registry_url="780245226102.dkr.ecr.us-west-2.amazonaws.com"
 
 # update the ecs task definition
 # create a new revision for the new image
-aws ecs register-task-definition --cli-input-json << EOF
+cat << EOF > task-def.json
 {
     "family": "fileupload-webapp",
     "containerDefinitions": [
@@ -51,6 +51,8 @@ aws ecs register-task-definition --cli-input-json << EOF
     ]
 }
 EOF
+
+aws ecs register-task-definition --cli-input-json < task-def.json
 
 # find the revision just created
 task_definition=$(aws ecs list-task-definitions | jq '.taskDefinitionArns[-1]')
