@@ -12,19 +12,19 @@ echo "latest commit is $(cat latest_commit)"'''
     stage('build') {
       steps {
         sh '''latest_commit=$(cat latest_commit)
-echo "last commit is ${last_commit}"
+echo "last commit is ${latest_commit}"
 
 registry_url="780245226102.dkr.ecr.us-west-2.amazonaws.com"
 
-docker build -t fileupload-webapp:${last_commit} .
-docker tag fileupload-webapp:${last_commit} ${registry_url}/fileupload-webapp:${last_commit}
-docker push ${registry_url}/fileupload-webapp:${last_commit}'''
+docker build -t fileupload-webapp:${latest_commit} .
+docker tag fileupload-webapp:${latest_commit} ${registry_url}/fileupload-webapp:${latest_commit}
+docker push ${registry_url}/fileupload-webapp:${latest_commit}'''
       }
     }
     stage('deploy') {
       steps {
         sh '''latest_commit=$(cat latest_commit)
-echo "last commit is ${last_commit}"
+echo "last commit is ${latest_commit}"
 
 registry_url="780245226102.dkr.ecr.us-west-2.amazonaws.com"
 
