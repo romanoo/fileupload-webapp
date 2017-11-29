@@ -8,13 +8,8 @@ body {
   margin-bottom: 30px;
 }
 
-.duke-cloud-service img {
-  width:72px;
-  height:100px;
-}
-
-.duke-cloud-service-title{
-  vertical-align:bottom ;
+.fileupload-service-title{
+  vertical-align:bottom;
   font-size:36px;
   font-weight:500;
   font-family: inherit;
