@@ -1,12 +1,21 @@
-box: docker
+box: python:2.7-slim
+
+dev:
+  steps:
+    - pip-install
+    - internal/watch:
+        code: python app.py
+        reload: true
 
 build:
   steps:
-    - nhuray/docker-build:
-        tag: rgrecour/fileupload-webapp:${WERCKER_GIT_COMMIT:0:7}
+    - pip-install
 
-    - nhuray/docker-push:
-        image: rgrecour/fileupload-webapp:${WERCKER_GIT_COMMIT:0:7}
+    - internal/docker-push:
         email: ${DOCKER_EMAIL}
-        password: ${DOCKER_PASSWORD}
         username: ${DOCKER_USERNAME}
+        password: ${DOCKER_PASSWORD}
+        repository: rgrecour/fileupload-webapp
+        entrypoint: python
+        cmd: "app.py"
+        ports: "5000, 8080"
