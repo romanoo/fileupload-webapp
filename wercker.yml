@@ -16,6 +16,7 @@ build:
         username: ${DOCKER_USERNAME}
         password: ${DOCKER_PASSWORD}
         repository: rgrecour/fileupload-webapp
+        tag: ${WERCKER_GIT_COMMIT:0:7}
         entrypoint: python
         cmd: "app.py"
         ports: "5000, 8080"
