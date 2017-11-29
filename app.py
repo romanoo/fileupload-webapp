@@ -57,9 +57,6 @@ def delete():
 def numerize(file, i):
     return file.filename[:file.filename.rfind(".")] + "-" + str(i) + file.filename[file.filename.rfind("."):]
 
-def root():
-  return app.send_static_file('index.html')
-
 @app.route('/files', defaults={'filename': None},methods=['GET','POST'])
 @app.route('/files/<path:filename>',methods=['GET'])
 def upload(filename):
