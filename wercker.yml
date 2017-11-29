@@ -1,4 +1,4 @@
-box: marvin/docker@0.0.3
+box: docker
 
 build:
   steps:
