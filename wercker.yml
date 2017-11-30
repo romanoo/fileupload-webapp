@@ -26,7 +26,7 @@ test1:
     - script:
         code: |
           python app.py &
-          python app_tests.py --test=test1
+          sleep 2 ; python app_tests.py --test=test1
 
 test2:
   steps:
@@ -34,4 +34,4 @@ test2:
     - script:
         code: |
           python app.py &
-          python app_tests.py --test=test2
+          sleep 2 ; python app_tests.py --test=test2
