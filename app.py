@@ -53,10 +53,8 @@ def human_readable_bytecount(bytes, si=False):
 
 @app.route('/delete', methods=['GET', 'POST'])
 def delete():
-    print(request.form)
     for key in request.form:
         path = os.path.join(app.config['UPLOAD_FOLDER'], key)
-        print("delete path: " + path)
         if os.path.exists(path):
             os.remove(path)
 
@@ -70,6 +68,29 @@ def numerize(file, i):
     else:
         return file.filename + "-" + str(i)
 
+
+@app.route('/rename', methods=['PUT'])
+def rename():
+    if not 'source' in request.form:
+        return "missing source", 400
+    if not 'target' in request.form:
+        return "missing target", 400
+
+    source = request.form['source']
+    target = request.form['target']
+
+    print("rename: " + source + " to: " + target)
+
+    source_filepath = os.path.join(app.config['UPLOAD_FOLDER'], source)
+    if not os.path.exists(source_filepath):
+        return "source file not found: " + source, 400
+
+    target_filepath = os.path.join(app.config['UPLOAD_FOLDER'], target)
+    if os.path.exists(target_filepath):
+        return "target already exists: " + target, 400
+
+    os.rename(source_filepath, target_filepath)
+    return 'OK'
 
 @app.route('/files', defaults={'filename': None}, methods=['GET', 'POST'])
 @app.route('/files/<path:filename>', methods=['GET'])
