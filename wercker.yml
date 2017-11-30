@@ -20,3 +20,15 @@ build:
         entrypoint: python
         cmd: "app.py"
         ports: "5000, 8080"
+
+test1:
+  steps:
+    - script:
+        code: |
+          python app_tests.py --test=test1
+
+test2:
+  steps:
+    - script:
+        code: |
+          python app_tests.py --test=test2
