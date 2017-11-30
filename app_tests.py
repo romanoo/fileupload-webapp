@@ -166,6 +166,8 @@ def test3(url):
 
 app_url = "http://localhost:5000"
 
+# Not using a test framwork yet..
+# Instead using some dummy command line args to drive what test to run.
 for arg in sys.argv[1:]:
     if arg.startswith("--url="):
         app_url = arg[6:]
