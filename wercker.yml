@@ -10,7 +10,6 @@ dev:
 build:
   steps:
     - pip-install
-
     - internal/docker-push:
         email: ${DOCKER_EMAIL}
         username: ${DOCKER_USERNAME}
@@ -23,12 +22,16 @@ build:
 
 test1:
   steps:
+    - pip-install
     - script:
         code: |
+          python app.py &
           python app_tests.py --test=test1
 
 test2:
   steps:
+    - pip-install
     - script:
         code: |
+          python app.py &
           python app_tests.py --test=test2
