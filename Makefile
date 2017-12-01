@@ -10,8 +10,8 @@ run:
 	python3 src/main/app.py
 
 test:
-	python3 src/test/integ_test1.py
-	python3 src/test/integ_test2.py
+	python3 src/test/app_test.py
+	bash src/test/curl_test.sh
 
 docker-build:
 	if [ ! -z "$${http_proxy}" ] ; then \

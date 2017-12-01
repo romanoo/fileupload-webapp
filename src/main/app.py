@@ -69,6 +69,10 @@ def root():
 def files(filename):
     # upload files
     if request.method == 'POST':
+
+        if request.files is None:
+            return "'files' required", 400
+
         for file in request.files.getlist("file"):
 
             file.stream.seek(0)
@@ -88,10 +92,10 @@ def files(filename):
                 else:
                     path = numerize_filename(original_path, i - 1)
 
-            # append if not first chunk
-            if not is_first_chunk:
+            if is_first_chunk:
                 outfile = open(path, "w+b")
             else:
+                # append if not first chunk
                 outfile = open(path, "ab")
             outfile.write(contents)
             outfile.close()
@@ -137,11 +141,10 @@ def files(filename):
 
     elif request.method == 'PUT':
 
-        new_filename = request.form['newname']
-        updated_files = request.files.getlist("file")
-
         # rename a file
-        if updated_files is None or len(updated_files) != 1:
+        if 'newname' in request.form:
+            new_filename = request.form['newname']
+
             if not file_exists_in_repo(filename):
                 return "Source file not found: " + filename, 400
 
@@ -149,26 +152,32 @@ def files(filename):
                 return "Target file already exists: " + new_filename, 400
 
             os.rename(get_repo_path(filename), get_repo_path(new_filename))
-            return 'OK'
+            return 'Renamed', 200
 
         # update a file
         else:
-            file = updated_files[0]
-            file.stream.seek(0)
-            contents = file.stream.read()
+
+            if request.files is None:
+                return "'files' required", 400
+
+            _files = request.files.getlist("file")
+            if len(_files) != 1:
+                return "'file' is required", 400
+
+            contents = _files[0].stream.read()
             content_range = request.headers.get('Content-Range')
             is_first_chunk = (content_range is None or content_range.startswith("bytes 0"))
 
             path = get_repo_path(filename)
 
-            # append if not first chunk
-            if not is_first_chunk:
+            if is_first_chunk:
                 outfile = open(path, "w+b")
             else:
+                # append if not first chunk
                 outfile = open(path, "ab")
             outfile.write(contents)
             outfile.close()
-            return "Updated", 202
+            return "Updated", 200
 
 def run():
     if not os.path.exists(app.config['UPLOAD_FOLDER']):

@@ -25,13 +25,13 @@ test1:
     - pip-install
     - script:
         code: |
-          python app.py &
-          sleep 2 ; python app_tests.py --test=test1
+          python src/main/app.py &
+          sleep 2 ; python src/test/app_tests.py
 
 test2:
   steps:
     - pip-install
     - script:
         code: |
-          python app.py &
-          sleep 2 ; python app_tests.py --test=test2
+          python src/main/app.py &
+          sleep 2 ; bash src/test/curl_test.sh
