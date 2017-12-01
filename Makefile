@@ -2,9 +2,16 @@ SHELL := /bin/bash
 PROJECT_DIR = $(shell pwd)
 IMAGE_NAME ?= rgrecour/fileupload-webapp:latest
 
-.PHONY: clean docker-build docker-push
+.PHONY: clean docker-build docker-push run test
 
 default: docker-build
+
+run:
+	python3 src/main/app.py
+
+test:
+	python3 src/test/integ_test1.py
+	python3 src/test/integ_test2.py
 
 docker-build:
 	if [ ! -z "$${http_proxy}" ] ; then \
