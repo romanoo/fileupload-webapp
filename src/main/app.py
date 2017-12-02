@@ -63,126 +63,125 @@ def root():
     return app.send_static_file('index.html')
 
 
-@app.route('/files', defaults={'filename': None}, methods=['GET', 'POST'])
+@app.route('/files', methods=['POST'])
+def upload_files():
+    if request.files is None:
+        return "'files' required", 400
+
+    for file in request.files.getlist("file"):
+
+        file.stream.seek(0)
+        contents = file.stream.read()
+        content_range = request.headers.get('Content-Range')
+        is_first_chunk = (content_range is None or content_range.startswith("bytes 0"))
+
+        original_path = get_repo_path(file.filename)
+        path, i = numerize_file(original_path)
+
+        if not is_first_chunk and os.path.exists(path):
+            # not the first chunk, need to append to a file
+            # append to the last file created for that name
+            # XXX this assumes no concurrent requests and needs to be fixed
+            if i == 1:
+                path = original_path
+            else:
+                path = numerize_filename(original_path, i - 1)
+
+        if is_first_chunk:
+            outfile = open(path, "w+b")
+        else:
+            # append if not first chunk
+            outfile = open(path, "ab")
+        outfile.write(contents)
+        outfile.close()
+
+    return 'Created', 201
+
+
 @app.route('/files/<path:filename>', methods=['GET'])
-@app.route('/files/<path:filename>', methods=['DELETE', 'PUT'])
-def files(filename):
-    # upload files
-    if request.method == 'POST':
+def download_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route('/files', methods=['GET'])
+def list_files():
+    files_list = []
+    for (rootdir, dirnames, filenames) in walk(app.config['UPLOAD_FOLDER']):
+        for filename in filenames:
+            filepath = os.path.join(rootdir, filename)
+            size = human_readable_bytecount(os.stat(filepath).st_size)
+            try:
+                mtime = os.path.getmtime(filepath)
+            except OSError:
+                mtime = 0
+            last_modified_date = datetime.fromtimestamp(mtime).strftime('%m/%d/%Y %H:%M:%S')
+            file = {
+                "name": filename,
+                "size": size,
+                "modified": last_modified_date
+            }
+            files_list.append(file)
+    return jsonify({"Files": files_list})
+
+
+@app.route('/files/<path:filename>', methods=['DELETE'])
+def delete_file(filename):
+    if filename is None:
+        return "Missing filepath", 400
+
+    if not file_exists_in_repo(filename):
+        return "File not found: " + filename, 404
+
+    os.remove(get_repo_path(filename))
+    return "File deleted", 200
+
+
+@app.route('/files/<path:filename>', methods=['PUT'])
+def update_file(filename):
+    # rename a file
+    if 'newname' in request.form:
+        new_filename = request.form['newname']
+
+        if not file_exists_in_repo(filename):
+            return "Source file not found: " + filename, 400
+
+        if file_exists_in_repo(new_filename):
+            return "Target file already exists: " + new_filename, 400
+
+        os.rename(get_repo_path(filename), get_repo_path(new_filename))
+        return 'Renamed', 200
+
+    # update a file
+    else:
 
         if request.files is None:
             return "'files' required", 400
 
-        for file in request.files.getlist("file"):
+        _files = request.files.getlist("file")
+        if len(_files) != 1:
+            return "'file' is required", 400
 
-            file.stream.seek(0)
-            contents = file.stream.read()
-            content_range = request.headers.get('Content-Range')
-            is_first_chunk = (content_range is None or content_range.startswith("bytes 0"))
+        contents = _files[0].stream.read()
+        content_range = request.headers.get('Content-Range')
+        is_first_chunk = (content_range is None or content_range.startswith("bytes 0"))
 
-            original_path = get_repo_path(file.filename)
-            path, i = numerize_file(original_path)
+        path = get_repo_path(filename)
 
-            if not is_first_chunk and os.path.exists(path):
-                # not the first chunk, need to append to a file
-                # append to the last file created for that name
-                # XXX this assumes no concurrent requests and needs to be fixed
-                if i == 1:
-                    path = original_path
-                else:
-                    path = numerize_filename(original_path, i - 1)
-
-            if is_first_chunk:
-                outfile = open(path, "w+b")
-            else:
-                # append if not first chunk
-                outfile = open(path, "ab")
-            outfile.write(contents)
-            outfile.close()
-
-        return 'Created', 201
-
-    elif request.method == 'GET':
-
-        # download a file
-        if filename is not None:
-            return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-        # list files
-        files_list = []
-        for (rootdir, dirnames, filenames) in walk(app.config['UPLOAD_FOLDER']):
-            for filename in filenames:
-                filepath = os.path.join(rootdir, filename)
-                size = human_readable_bytecount(os.stat(filepath).st_size)
-                try:
-                    mtime = os.path.getmtime(filepath)
-                except OSError:
-                    mtime = 0
-                last_modified_date = datetime.fromtimestamp(mtime).strftime('%m/%d/%Y %H:%M:%S')
-                file = {
-                    "name": filename,
-                    "size": size,
-                    "modified": last_modified_date
-                }
-                files_list.append(file)
-        return jsonify({"Files": files_list})
-
-    # delete a file
-    elif request.method == 'DELETE':
-
-        if filename is None:
-            return "Missing filepath", 400
-
-        if not file_exists_in_repo(filename):
-            return "File not found: " + filename, 404
-
-        os.remove(get_repo_path(filename))
-        return "File deleted", 200
-
-    elif request.method == 'PUT':
-
-        # rename a file
-        if 'newname' in request.form:
-            new_filename = request.form['newname']
-
-            if not file_exists_in_repo(filename):
-                return "Source file not found: " + filename, 400
-
-            if file_exists_in_repo(new_filename):
-                return "Target file already exists: " + new_filename, 400
-
-            os.rename(get_repo_path(filename), get_repo_path(new_filename))
-            return 'Renamed', 200
-
-        # update a file
+        if is_first_chunk:
+            outfile = open(path, "w+b")
         else:
+            # append if not first chunk
+            outfile = open(path, "ab")
+        outfile.write(contents)
+        outfile.close()
+        return "Updated", 200
 
-            if request.files is None:
-                return "'files' required", 400
-
-            _files = request.files.getlist("file")
-            if len(_files) != 1:
-                return "'file' is required", 400
-
-            contents = _files[0].stream.read()
-            content_range = request.headers.get('Content-Range')
-            is_first_chunk = (content_range is None or content_range.startswith("bytes 0"))
-
-            path = get_repo_path(filename)
-
-            if is_first_chunk:
-                outfile = open(path, "w+b")
-            else:
-                # append if not first chunk
-                outfile = open(path, "ab")
-            outfile.write(contents)
-            outfile.close()
-            return "Updated", 200
 
 def run():
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
     app.run(host='0.0.0.0', debug=True)
+
 
 if __name__ == "__main__":
     run()
