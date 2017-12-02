@@ -13,9 +13,9 @@ install_jq(){
     JQ_INSTALL_DIR=${HOME}/bin
     uname=$(uname)
     mkdir -p ${JQ_INSTALL_DIR} 2>&1 || true
-    if [ "${uname}" = "linux" ] ; then
+    if [ "${uname}" = "Linux" ] ; then
         DOWNLOAD_URL="${JQ_DOWNLOAD_URL}/download/jq-${JQ_VERSION}/jq-linux64"
-    elif [ "${uname}" = "darwin" ] ; then
+    elif [ "${uname}" = "Darwin" ] ; then
         DOWNLOAD_URL="${JQ_DOWNLOAD_URL}/download/jq-${JQ_VERSION}/jq-osx-amd64"
     else
         echo "jq not found in PATH"
