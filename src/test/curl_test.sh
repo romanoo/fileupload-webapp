@@ -10,7 +10,7 @@ install_jq(){
     if type jq > /dev/null 2>&1; then return 0 ; fi
     JQ_DOWNLOAD_URL="https://github.com/stedolan/jq/releases"
     JQ_VERSION="1.5"
-    JQ_INSTALL_DIR=${HOME}/bin
+    JQ_INSTALL_DIR=/tmp/bin
     uname=$(uname)
     mkdir -p ${JQ_INSTALL_DIR} 2>&1 || true
     if [ "${uname}" = "Linux" ] ; then
@@ -22,7 +22,8 @@ install_jq(){
         echo "Download it at ${JQ_DOWNLOAD_URL}"
         return 1
     fi
-    curl ${DOWNLOAD_URL} > ${JQ_INSTALL_DIR}/jq
+    curl -k -L ${DOWNLOAD_URL} > ${JQ_INSTALL_DIR}/jq
+    chmod +x ${JQ_INSTALL_DIR}/jq
     export PATH="${JQ_INSTALL_DIR}:${PATH}"
 }
 

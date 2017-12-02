@@ -1,4 +1,4 @@
-box: python:2.7-slim
+box: python:alpine
 
 dev:
   steps:
@@ -33,5 +33,6 @@ test2:
     - pip-install
     - script:
         code: |
+          apk update ; apk add bash curl
           python3 src/main/app.py &
           sleep 2 ; bash src/test/curl_test.sh
