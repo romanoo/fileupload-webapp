@@ -8,6 +8,20 @@ function refresh() {
             "files" : response.Files
         });
         $("#tableapp").find("tbody").html(rendered);
+        $("#tableapp").find(".close").each(function(i, elt){
+            var name = $(elt).attr("name");
+            if(name !== undefined){
+                $(elt).click(function(){
+                    $.ajax({
+                        url: "/files/" + name,
+                        type: "DELETE",
+                        success: function() {
+                            refresh();
+                        }
+                    });
+                });
+            }
+        });
     });
 }
 

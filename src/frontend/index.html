@@ -101,11 +101,9 @@
             <td>{{modified}}</td>
             <td>{{size}}</td>
             <td>
-                <form action="/files/{{name}}" method="delete">
-                    <button type="submit" class="close" data-dismiss="modal" aria-hidden="true">
-                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                    </button>
-                </form>
+                <button type="submit" name="{{name}}" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
              </td>
          </tr>
     {{/files}}
