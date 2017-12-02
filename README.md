@@ -9,3 +9,9 @@
 * Jenkinsfile (not up-to-date)
 * wercker.yml
 * circle-ci (TODO)
+
+# Build the Docker image
+
+```bash
+make NOCACHE=true
+```
