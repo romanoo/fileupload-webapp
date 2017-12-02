@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>File Upload Service</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.19.1/css/jquery.fileupload.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="fileupload-service">
+        <span class="fileupload-service-title">File Upload Service</span>
+    </div>
+
+    <div class="tabcontent">
+        <div id="tab1" class="tab-pane fade in active">
+            <br>
+            <blockquote>
+                <p>Upload files to ~/.fileupload-service</p>
+            </blockquote>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Add a file</h3>
+                </div>
+                <div class="panel-body">
+                    <span class="btn btn-success fileinput-button">
+                        <i class="glyphicon glyphicon-plus"></i>
+                        <span>Select FILE...</span>
+                        <input id="fileupload" type="file" name="file" multiple>
+                    </span>
+                    <br>
+                    <br>
+                    <div id="progressbarholder">
+                        <div id='progress' class='progress'>
+                            <div class='progress-bar progress-bar-success' style='min-width: 2em;'>0%</div>
+                        </div>
+                    </div>
+                    <div id="files" class="files"></div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">List of uploaded files</h3>
+                </div>
+                <div class="panel-body">
+                    <table id="tableapp" class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date modified</th>
+                            <th>Size</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab2" class="tab-pane fade">
+            <div class="panel-body">
+                <table id="testtable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date modified</th>
+                        <th>Size</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab3" class="tab-pane fade">
+            <h3>Test</h3>
+            <p>Insert comments here.</p>
+        </div>
+    </div>
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.19.1/js/vendor/jquery.ui.widget.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.19.1/js/jquery.iframe-transport.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.19.1/js/jquery.fileupload.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script>
+<script src="js/fileupload-ui.js"></script>
+<script>
+    $(function () { init(); });
+</script>
+<script id="render_files_tpl" type="x-tmpl-mustache">
+    {{#files}}
+        <tr>
+            <td><a href="files/{{name}}">{{name}}</a></td>
+            <td>{{modified}}</td>
+            <td>{{size}}</td>
+            <td>
+                <button type="submit" name="{{name}}" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+             </td>
+         </tr>
+    {{/files}}
+</script>
+</body>
+</html>
