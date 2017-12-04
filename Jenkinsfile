@@ -8,7 +8,8 @@ pipeline {
   stages {
     stage('init') {
       steps {
-        sh '''apk update
+        sh '''env
+apk update
 apk add make bash'''
       }
     }
