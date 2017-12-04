@@ -8,7 +8,7 @@
 
 * Jenkinsfile (not up-to-date)
 * wercker.yml
-* circle-ci (TODO)
+* circle-ci
 
 # Build the Docker image
 

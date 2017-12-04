@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    working_directory: /app
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install dependencies
+          command: |
+            apk update
+            apk add make bash
+      - run:
+          name: Build Docker image
+          command: |
+            make NOCACHE=true docker-build
+      - run:
+          name: Run tests
+          command: |
+            make test-docker
+      - deploy:
+          name: Push Docker image
+          command: |
+            docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+            make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:${CIRCLE_SHA1}"

@@ -1,7 +1,17 @@
 import unittest
 import sys, tempfile, os, requests, json
+import argparse
 
-app_url = "http://127.0.0.1:5000"
+parser = argparse.ArgumentParser()
+parser.add_argument('--url', default='http://localhost:5000')
+parser.add_argument('unittest_args', nargs='*')
+args = parser.parse_args()
+app_url = args.url
+
+proxies = {
+    "http": None,
+    "https": None,
+}
 
 def generate_payload(fname, message):
     print("generating file: " + fname + " with content: " + message)
@@ -14,21 +24,21 @@ def generate_payload(fname, message):
 def upload_file(file):
     print("uploading file: " + file)
     files = [('file', open(file, "rb"))]
-    rsp = requests.post(app_url + "/files", files=files)
+    rsp = requests.post(app_url + "/files", files=files, proxies=proxies)
     if rsp.status_code != 201:
         raise Exception("unexpected response code: " + str(rsp.status_code) + " - " + rsp.text)
 
 
 def delete_uploaded_file(filename):
     print("deleting uploaded file: " + filename)
-    rsp = requests.delete(app_url + "/files/" + filename)
+    rsp = requests.delete(app_url + "/files/" + filename, proxies=proxies)
     if rsp.status_code != 200:
         raise Exception('unexcepted response code ' + str(rsp.status_code) + " - " + rsp.text)
 
 
 def list_uploaded_files():
     print("listing uploaded files")
-    rsp = requests.get(app_url + "/files")
+    rsp = requests.get(app_url + "/files", proxies=proxies)
     if rsp.status_code != 200:
         raise Exception('unexcepted response code ' + str(rsp.status_code) + " - " + rsp.text)
     listing = json.loads(rsp.text)
@@ -50,7 +60,7 @@ def delete_all_files():
 
 def download_uploaded_file(filename, target_filename):
     print("downloading file: " + filename + " into: " + target_filename)
-    rsp = requests.get(app_url + "/files/" + filename)
+    rsp = requests.get(app_url + "/files/" + filename, proxies=proxies)
     if rsp.status_code != 200:
         raise Exception('unexcepted response code ' + str(rsp.status_code) + " - " + rsp.text)
     f = open(os.path.join(tempfile.gettempdir(), target_filename), 'wb')
@@ -70,14 +80,14 @@ def is_text_file_content(filename, content):
 
 def rename_uploaded_file(source_filename, target_filename):
     print("renaming file: " + source_filename + " to: " + target_filename)
-    rsp = requests.put(app_url + "/files/" + source_filename, data={"newname": target_filename})
+    rsp = requests.put(app_url + "/files/" + source_filename, data={"newname": target_filename}, proxies=proxies)
     if rsp.status_code != 200:
         raise Exception('unexcepted response code ' + str(rsp.status_code) + " - " + rsp.text)
 
 
 def update_uploaded_file(filename, newfile):
     print("update file: " + filename)
-    rsp = requests.put(app_url + "/files/" + filename, files={'file': open(newfile, "rb")})
+    rsp = requests.put(app_url + "/files/" + filename, files={'file': open(newfile, "rb")}, proxies=proxies)
     if rsp.status_code != 200:
         raise Exception('unexcepted response code ' + str(rsp.status_code) + " - " + rsp.text)
 
@@ -191,5 +201,5 @@ class FilesTestCase(unittest.TestCase):
         self.assertTrue(is_text_file_content(foo3, "bar2"))
 
 if __name__ == '__main__':
-
+    sys.argv[1:] = args.unittest_args
     unittest.main(warnings='ignore')

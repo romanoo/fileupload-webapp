@@ -13,12 +13,14 @@ if repo_dir_parent is None or repo_dir_parent == "":
 repo_dir = os.path.join(repo_dir_parent, ".fileupload-service")
 
 app = Flask(__name__, static_url_path='', static_folder=frontend_dir)
+app.config['UPLOAD_FOLDER'] = repo_dir
+debug = False
 
-if len(sys.argv) == 2:
-    app.config['UPLOAD_FOLDER'] = sys.argv[1]
-else:
-    app.config['UPLOAD_FOLDER'] = repo_dir
-
+for arg in sys.argv[1:]:
+    if arg.startswith("--repo-dir="):
+        app.config['UPLOAD_FOLDER'] = arg[11:]
+    elif arg.startswith("--debug"):
+        debug = True
 
 def human_readable_bytecount(bytes, si=False):
     unit = 1000 if si else 1024
@@ -180,7 +182,7 @@ def update_file(filename):
 def run():
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=debug)
 
 
 if __name__ == "__main__":

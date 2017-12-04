@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
 
+on_exit(){
+    if [ ${?} -ne 0 ] ; then
+        echo "[ERROR] Error occurred at ${BASH_SOURCE}:${LINENO} command: ${BASH_COMMAND}"
+    else
+        echo "[PASSED]"
+    fi
+
+}
+trap on_exit EXIT
+
 set -e
 set -x
 
-CURL_OPTS="-s --noproxy '*'"
 APP_URL="http://localhost:5000"
+
+for arg in ${*} ; do
+    if [[ ${arg} =~ ^\-\-url= ]] ; then APP_URL=${arg##--url=} ; fi
+done
+
+APP_HOSTNAME=$(echo ${APP_URL} | sed -E -e 's_.*://([^/@]*@)?([^/:]+).*_\2_')
+CURL_OPTS="-s --noproxy ${APP_HOSTNAME}"
 
 install_jq(){
     if type jq > /dev/null 2>&1; then return 0 ; fi
