@@ -12,7 +12,7 @@ pipeline {
 docker info'''
       }
     }
-    stage('Build') {
+    stage('Test') {
       steps {
         sh '''env
 docker info'''
