@@ -11,6 +11,15 @@ pipeline {
     LOCAL_IMAGE_NAME = 'fileupload-webapp:${BUILD_TAG}'
   }
   stages {
+    stage('Init') {
+      // XXX assuming alpine
+      steps {
+        sh '''if [ ! -z "${http_proxy}" ] ; then  export http_proxy="http://${http_proxy##*://}" ; fi
+if [ ! -z "${HTTP_PROXY}" ] ; then  export HTTP_PROXY="http://${HTTP_PROXY##*://}" ; fi
+apk update
+apk add bash make'''
+      }
+    }
     stage('Build') {
       steps {
         sh 'make NOCACHE=true docker-build'
