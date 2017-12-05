@@ -22,7 +22,7 @@ apk add bash make'''
     }
     stage('Build') {
       steps {
-        sh 'make NOCACHE=true docker-build'
+        sh 'make NOCACHE=true clean docker-build'
       }
     }
     stage('Test') {

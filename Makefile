@@ -47,7 +47,7 @@ docker-rm:
 	docker rm -f $(LOCAL_IMAGE_NAME) || true
 
 docker-rmi:
-	docker rmi -f $(IMAGE_NAME) || true
+	docker rmi -f $(LOCAL_IMAGE_NAME) || true
 
 test-docker: docker-run
 	if [ ! -z "$${http_proxy}" ] ; then \
