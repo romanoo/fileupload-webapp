@@ -1,37 +1,22 @@
 pipeline {
-  agent {
-    docker {
-      image 'docker:17.05.0-ce-git'
-    }
-    
+  /* See https://groups.google.com/forum/#!topic/jenkinsci-users/y_IOIxXb4T8 */
+  /* agent { label 'docker' } */
+  environment {
+    DOCKER_USERNAME = credentials('DOCKER_USERNAME')
+    DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
   }
   stages {
-    stage('init') {
+    stage('Build') {
       steps {
         sh '''env
-apk update
-apk add make bash'''
+docker info'''
       }
     }
-    stage('build') {
+    stage('Build') {
       steps {
-        sh 'make NOCACHE=true docker-build'
+        sh '''env
+docker info'''
       }
     }
-    stage('test') {
-      steps {
-        sh 'make test-docker'
-      }
-    }
-    stage('push') {
-      steps {
-        sh '''docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:$(git rev-parse --short HEAD)"'''
-      }
-    }
-  }
-  environment {
-    DOCKER_USERNAME = 'credentials(\'DOCKER_USERNAME\')'
-    DOCKER_PASSWORD = 'credentials(\'DOCKER_PASSWORD\')'
   }
 }
