@@ -6,7 +6,7 @@
 
 # Continuous Integration
 
-* Jenkinsfile (not up-to-date)
+* Jenkinsfile
 * wercker.yml
 * circle-ci
 
