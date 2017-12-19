@@ -3,9 +3,17 @@ image: docker:17.05.0-ce-git
 variables:
   GIT_SSL_NO_VERIFY: "true"
 
+before_script: |
+  echo "find corresponding branch"
+  echo "set status pending"
+
+after_script: |
+  echo "find corresponding branch"
+  echo "get gitlab pipeline status"
+  echo "set final status"
+
 stages:
   - build
-  - report
 
 build_job:
   stage: build
@@ -16,12 +24,5 @@ build_job:
     make test-docker
     docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
     make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:${CI_COMMIT_SHA:0:10}"
-  tags:
-    - j4c
-
-report_job:
-  stage: report
-  script: |
-    # report to github.
   tags:
     - j4c
