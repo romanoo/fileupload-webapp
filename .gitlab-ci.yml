@@ -3,14 +3,16 @@ image: docker:17.05.0-ce-git
 variables:
   GIT_SSL_NO_VERIFY: "true"
 
-before_script: |
-  echo "find corresponding branch"
-  echo "set status pending"
+before_script:
+  - >
+    echo "find corresponding branch"
+    echo "set status pending"
 
-after_script: |
-  echo "find corresponding branch"
-  echo "get gitlab pipeline status"
-  echo "set final status"
+after_script:
+  - >
+    echo "find corresponding branch"
+    echo "get gitlab pipeline status"
+    echo "set final status"
 
 stages:
   - build
