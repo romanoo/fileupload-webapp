@@ -1,0 +1,34 @@
+image: docker:17.05.0-ce-git
+
+variables:
+  GIT_SSL_NO_VERIFY: "true"
+
+stages:
+  - init
+  - build
+  - finalize
+
+init_job:
+  stage: init
+  script: |
+    apk update
+    apk add make bash
+  tags:
+    - j4c
+
+build_job:
+  stage: build
+  script: |
+    make NOCACHE=true docker-build
+    make test-docker
+    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+    make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:${CI_COMMIT_SHA:0:10}"
+  tags:
+    - j4c
+
+finalize_job:
+  stage: init
+  script: |
+    # report to github.
+  tags:
+    - j4c
