@@ -4,21 +4,14 @@ variables:
   GIT_SSL_NO_VERIFY: "true"
 
 stages:
-  - init
   - build
-  - finalize
-
-init_job:
-  stage: init
-  script: |
-    apk update
-    apk add make bash
-  tags:
-    - j4c
+  - report
 
 build_job:
   stage: build
   script: |
+    apk update
+    apk add make bash
     make NOCACHE=true docker-build
     make test-docker
     docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
@@ -26,8 +19,8 @@ build_job:
   tags:
     - j4c
 
-finalize_job:
-  stage: init
+report_job:
+  stage: report
   script: |
     # report to github.
   tags:
