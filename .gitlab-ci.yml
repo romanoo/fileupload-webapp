@@ -1,4 +1,4 @@
-image: docker:17.05.0-ce-git
+image: docker:17.09.1-ce-git
 
 variables:
   GIT_SSL_NO_VERIFY: "true"
