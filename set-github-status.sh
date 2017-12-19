@@ -14,13 +14,11 @@ if [ "${1}" = "pending" ] ; then
 else
   log_msg "[INFO] - Retrieving pipeline state"
 
-  # parse CI_PROJECT_URL
-  CI_PROJECT_URL_FIELDS=($(echo "${CI_PROJECT_URL}" | \
-    awk '{split($0, arr, /[\/\@:]*/); for (x in arr) { print arr[x] }}'))
-
   # derive GITLAB_HOST and GITLAB_API_URL from CI_PROJECT_URL
-  GITLAB_HOST=${CI_PROJECT_URL_FIELDS[2]}
-  GITLAB_API_URL="${CI_PROJECT_URL_FIELDS[1]}://${GITLAB_HOST}/api/v4"
+  GITLAB_URL_PROTO="$(echo ${CI_PROJECT_URL} | sed -e's,^\(.*://\).*,\1,g')"
+  PARSED_GITLAB_URL="$(echo ${CI_PROJECT_URL/${GITLAB_URL_PROTO}/})"
+  GITLAB_HOST="$(echo ${PARSED_GITLAB_URL} | cut -d/ -f1)"
+  GITLAB_API_URL="${GITLAB_URL_PROTO}${GITLAB_HOST}/api/v4"
 
   PIPELINE_STATE_HTTP_CODE=$(curl -k --noproxy ${GITLAB_HOST} \
         --silent \
