@@ -19,7 +19,7 @@ else
     awk '{split($0, arr, /[\/\@:]*/); for (x in arr) { print arr[x] }}'))
 
   # derive GITLAB_HOST and GITLAB_API_URL from CI_PROJECT_URL
-  GITLAB_HOST=${CI_PROJECT_URL_FIELDS[1]}
+  GITLAB_HOST=${CI_PROJECT_URL_FIELDS[0]}
   GITLAB_API_URL="${CI_PROJECT_URL_FIELDS[3]}://${GITLAB_HOST}/api/v4"
 
   PIPELINE_STATE_HTTP_CODE=$(curl -k --noproxy ${GITLAB_HOST} \
