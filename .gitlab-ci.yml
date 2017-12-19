@@ -33,6 +33,9 @@ build_job:
 finalize_job:
   stage: finalize
   script: |
+    apk update
+    apk add curl
+
     # TODO get gitlab pipeline status
     cat > status.json <<
     {
