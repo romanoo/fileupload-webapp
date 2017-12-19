@@ -2,6 +2,8 @@ image: docker:17.05.0-ce-git
 
 variables:
   GIT_SSL_NO_VERIFY: "true"
+  GITHUB_OWNER: "romain-grecourt"
+  GITHUB_REPO_NAME: "fileupload-webapp"
 
 stages:
   - init
@@ -11,7 +13,6 @@ stages:
 init_job:
   stage: init
   script: |
-    echo "find corresponding branch"
     echo "set status pending"
   when: always
   tags:
@@ -32,9 +33,22 @@ build_job:
 finalize_job:
   stage: finalize
   script: |
-    echo "find corresponding branch"
-    echo "get gitlab pipeline status"
-    echo "set final status"
+    # TODO get gitlab pipeline status
+    cat > status.json <<
+    {
+      "state": "success",
+      "target_url": "${CI_PROJECT_URL}/pipelines/${CI_PIPELINE_ID}",
+      "description": "The pipeline succeeded!",
+      "context": "internal/gitlab-pipeline"
+    }
+    EOF
+    curl \
+      -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+      -X POST \
+      -H application/vnd.github.v3+json \
+      -H "Content-Type: application/json" \
+      --data @status.json \
+      https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO_NAME}/statuses/${CI_COMMIT_SHA}
   when: always
   tags:
     - j4c
