@@ -56,6 +56,7 @@ REPORT_STATE_HTTP_CODE=$(curl \
   -X POST \
   -H "application/vnd.github.v3+json" \
   -H "Content-Type: application/json" \
+  -o github-status.json \
   --data @status.json \
   https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO_NAME}/statuses/${CI_COMMIT_SHA})
 
