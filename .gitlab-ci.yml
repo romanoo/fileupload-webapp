@@ -28,3 +28,10 @@ build_job:
     make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:${CI_COMMIT_SHA:0:10}"
   tags:
     - j4c
+
+build_job_2:
+  stage: build
+  script: |
+    echo "a dummy 2nd build job"
+  tags:
+    - j4c
