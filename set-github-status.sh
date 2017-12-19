@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-if [ -z "${1}" = "pending" ] ; then
+if [ "${1}" = "pending" ] ; then
   cat > status.json << EOF
   {
     "state": "pending",
