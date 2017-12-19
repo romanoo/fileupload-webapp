@@ -21,12 +21,12 @@ init_job:
 build_job:
   stage: build
   script: |
-    apk update
-    apk add make bash
-    make NOCACHE=true docker-build
-    make test-docker
-    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-    make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:${CI_COMMIT_SHA:0:10}"
+    # apk update
+    # apk add make bash
+    # make NOCACHE=true docker-build
+    # make test-docker
+    # docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+    # make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:${CI_COMMIT_SHA:0:10}"
   tags:
     - j4c
 
@@ -35,23 +35,7 @@ finalize_job:
   script: |
     apk update
     apk add curl
-
-    # TODO get gitlab pipeline status
-    cat > status.json <<
-    {
-      "state": "success",
-      "target_url": "${CI_PROJECT_URL}/pipelines/${CI_PIPELINE_ID}",
-      "description": "The pipeline succeeded!",
-      "context": "internal/gitlab-pipeline"
-    }
-    EOF
-    curl \
-      -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
-      -X POST \
-      -H application/vnd.github.v3+json \
-      -H "Content-Type: application/json" \
-      --data @status.json \
-      https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO_NAME}/statuses/${CI_COMMIT_SHA}
+    ./set-github-status.sh
   when: always
   tags:
     - j4c
