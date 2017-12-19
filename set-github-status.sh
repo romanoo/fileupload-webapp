@@ -1,32 +1,65 @@
 #!/bin/bash -ex
 
+readonly SCRIPT_NAME=$(basename ${0})
+log_msg(){
+    if [ ${#@} -eq 0 ] ; then echo "log_msg - missing arguments: msg ..." ; return 1 ; fi
+    printf "\n### [`TZ=PST8PDT date +"%b %d %Y %T"`] [ ${SCRIPT_NAME} ] ${*} ###\n"
+}
+
+# TODO add cmd usage and params
+
 if [ "${1}" = "pending" ] ; then
-  cat > status.json << EOF
-  {
-    "state": "pending",
-    "target_url": "${CI_PROJECT_URL}/pipelines/${CI_PIPELINE_ID}",
-    "description": "Internal Gitlab pipeline created",
-    "context": "internal/gitlab-pipeline"
-  }
-EOF
+  STATE="pending"
+  DESCRIPTION="Internal Gitlab pipeline created"
 else
-  # TODO get gitlab pipeline status
-  cat > status.json << EOF
-  {
-    "state": "success",
-    "target_url": "${CI_PROJECT_URL}/pipelines/${CI_PIPELINE_ID}",
-    "description": "Internal Gitlab pipeline passed",
-    "context": "internal/gitlab-pipeline"
-  }
-EOF
+  log_msg "[INFO] - Retrieving pipeline state"
+
+  PIPELINE_STATE_HTTP_CODE=$(curl -k --noproxy ${GITLAB_HOST} \
+        --silent \
+        --write-out "%{http_code}\n" \
+        -o gitlab-pipeline-jobs.json \
+        --header "PRIVATE-TOKEN: ${PRIVATE_TOKEN}" \
+        "${GITLAB_API_URL}/projects/${PROJECT_ID}")
+
+  if [ "${PIPELINE_STATE_HTTP_CODE}" != "200" ] ; then
+    log_msg "[ERROR] - Unexpected http_code (${PIPELINE_STATE_HTTP_CODE})" >&2
+    exit 1
+  fi
+
+  IS_SUCCESS=$(cat gitlab-pipeline-jobs.json | \
+    jq "[ .[] | select(.name != \"${CI_JOB_NAME}\") ] | all(.status == \"success\")")
+
+  if ${IS_SUCCESS} ; then
+    STATE="failure"
+    DESCRIPTION="Internal Gitlab pipeline failed"
+  else
+    STATE="success"
+    DESCRIPTION="Internal Gitlab pipeline passed"
+  fi
 fi
 
-curl \
+log_msg "[INFO] - Reporting pipeline state(${STATE})"
+
+cat > status.json << EOF
+  {
+    "state": "${STATE}",
+    "target_url": "${CI_PROJECT_URL}/pipelines/${CI_PIPELINE_ID}",
+    "description": "${DESCRIPTION}",
+    "context": "internal/gitlab-pipeline"
+  }
+EOF
+
+REPORT_STATE_HTTP_CODE=$(curl \
   -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+  --silent \
+  --write-out "%{http_code}\n" \
   -X POST \
   -H "application/vnd.github.v3+json" \
   -H "Content-Type: application/json" \
   --data @status.json \
-  https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO_NAME}/statuses/${CI_COMMIT_SHA}
+  https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO_NAME}/statuses/${CI_COMMIT_SHA})
 
-
+if [ "${HTTP_CODE}" != "200" ] ; then
+  log_msg "[ERROR] - Unexpected http_code (${REPORT_STATE_HTTP_CODE})" >&2
+  exit 1
+fi
