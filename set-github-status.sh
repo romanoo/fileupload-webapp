@@ -59,7 +59,7 @@ REPORT_STATE_HTTP_CODE=$(curl \
   --data @status.json \
   https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO_NAME}/statuses/${CI_COMMIT_SHA})
 
-if [ "${HTTP_CODE}" != "200" ] ; then
+if [ "${HTTP_CODE}" != "201" ] ; then
   log_msg "[ERROR] - Unexpected http_code (${REPORT_STATE_HTTP_CODE})" >&2
   exit 1
 fi
