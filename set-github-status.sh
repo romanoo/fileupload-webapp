@@ -1,24 +1,24 @@
 #!/bin/bash -ex
 
 if [ -z "${1}" = "pending" ] ; then
-  cat > status.json <<
+  cat > status.json << EOF
   {
     "state": "pending",
     "target_url": "${CI_PROJECT_URL}/pipelines/${CI_PIPELINE_ID}",
     "description": "Internal Gitlab pipeline created",
     "context": "internal/gitlab-pipeline"
   }
-  EOF
+EOF
 else
   # TODO get gitlab pipeline status
-  cat > status.json <<
+  cat > status.json << EOF
   {
     "state": "success",
     "target_url": "${CI_PROJECT_URL}/pipelines/${CI_PIPELINE_ID}",
     "description": "Internal Gitlab pipeline passed",
     "context": "internal/gitlab-pipeline"
   }
-  EOF
+EOF
 fi
 
 curl \
