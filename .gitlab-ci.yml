@@ -18,5 +18,8 @@ mirror_job:on-schedule:
     PARSED_GITLAB_URL="$(echo ${CI_PROJECT_URL/${GITLAB_URL_PROTO}/})"
     GITLAB_HOST="$(echo ${PARSED_GITLAB_URL} | cut -d/ -f1)"
 
-    git push --mirror $(echo ${CI_REPOSITORY_URL} | perl -pe 's#.*@(.+?(\:\d+)?)/#git@\1:#')
+    # ignore host checking for GITLAB_HOST
     echo -e "Host ${GITLAB_HOST}\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
+    # push everything to gitlab
+    git push --mirror $(echo ${CI_REPOSITORY_URL} | perl -pe 's#.*@(.+?(\:\d+)?)/#git@\1:#')
