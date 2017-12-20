@@ -9,9 +9,11 @@ mirror_job:on-schedule:
     apk update
     apk add perl openssh-client
 
-    # clone everything from github
-    git clone --bare https://github.com/romain-grecourt/fileupload-webapp.git
-    cd fileupload-webapp.git
+    if [ ! -z "${IDENTITY_FILE}" ]; then
+      mkdir -p ~/.ssh
+      echo "${IDENTITY_FILE}" > ~/.ssh/id_rsa
+      chmod og-rwx ~/.ssh/id_rsa
+    fi
 
     # derive GITLAB_HOST from CI_PROJECT_URL
     GITLAB_URL_PROTO="$(echo ${CI_PROJECT_URL} | sed -e's,^\(.*://\).*,\1,g')"
@@ -19,8 +21,9 @@ mirror_job:on-schedule:
     GITLAB_HOST="$(echo ${PARSED_GITLAB_URL} | cut -d/ -f1)"
 
     # ignore host checking for GITLAB_HOST
-    mkdir -p ~/.ssh
     echo -e "Host ${GITLAB_HOST}\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
-    # push everything to gitlab
+    # clone everything from github and push to gitlab
+    git clone --bare https://github.com/romain-grecourt/fileupload-webapp.git
+    cd fileupload-webapp.git
     git push --mirror $(echo ${CI_REPOSITORY_URL} | perl -pe 's#.*@(.+?(\:\d+)?)/#git@\1:#')
