@@ -1,0 +1,12 @@
+variables:
+  GIT_SSL_NO_VERIFY: "true"
+
+mirror_job:on-schedule:
+  image: robotgraves/curl-git
+  only:
+    - schedules
+  script: |
+    apk add perl
+    git clone --bare https://github.com/romain-grecourt/fileupload-webapp.git
+    cd fileupload-webapp.git
+    git push --mirror $(echo ${CI_REPOSITORY_URL} | perl -pe 's#.*@(.+?(\:\d+)?)/#git@\1:#')
