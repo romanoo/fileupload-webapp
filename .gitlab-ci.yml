@@ -13,7 +13,6 @@ stages:
 init_job:
   stage: init
   script: |
-    ls -l
     apk update
     apk add bash curl
     ./set-github-status.sh "pending"
@@ -24,12 +23,12 @@ init_job:
 build_job:
   stage: build
   script: |
-    # apk update
-    # apk add make bash
-    # make NOCACHE=true docker-build
-    # make test-docker
-    # docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-    # make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:${CI_COMMIT_SHA:0:10}"
+    apk update
+    apk add make bash
+    make NOCACHE=true docker-build
+    make test-docker
+    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+    make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:${CI_COMMIT_SHA:0:10}"
   tags:
     - j4c
 
@@ -41,7 +40,6 @@ finalize_job:
 
     curl -k -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > /usr/bin/jq
     chmod +x /usr/bin/jq
-    echo $PATH
 
     ./set-github-status.sh
   when: always

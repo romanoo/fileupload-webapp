@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 readonly SCRIPT_NAME=$(basename ${0})
 log_msg(){
@@ -7,7 +7,6 @@ log_msg(){
 }
 
 # TODO add cmd usage and params
-
 if [ "${1}" = "pending" ] ; then
   STATE="pending"
   DESCRIPTION="Internal Gitlab pipeline created"
