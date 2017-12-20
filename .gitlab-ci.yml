@@ -19,6 +19,7 @@ mirror_job:on-schedule:
     GITLAB_HOST="$(echo ${PARSED_GITLAB_URL} | cut -d/ -f1)"
 
     # ignore host checking for GITLAB_HOST
+    mkdir -p ~/.ssh
     echo -e "Host ${GITLAB_HOST}\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
     # push everything to gitlab
