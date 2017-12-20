@@ -5,6 +5,7 @@ variables:
   GITHUB_OWNER: "romain-grecourt"
   GITHUB_REPO_NAME: "fileupload-webapp"
 
+# stages to report status to github (init -> pending, finalize  -> final status)
 stages:
   - init
   - build
