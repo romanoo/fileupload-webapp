@@ -6,6 +6,7 @@ mirror_job:on-schedule:
   only:
     - schedules
   script: |
+    apk update
     apk add perl
     git clone --bare https://github.com/romain-grecourt/fileupload-webapp.git
     cd fileupload-webapp.git
