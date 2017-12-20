@@ -10,15 +10,15 @@ mirror_job:on-schedule:
     apk update
     apk add perl openssh-client
 
+    mkdir -p ~/.ssh
     if [ ! -z "${IDENTITY_FILE}" ]; then
-      mkdir -p ~/.ssh
       echo "${IDENTITY_FILE}" > ~/.ssh/id_rsa
       chmod og-rwx ~/.ssh/id_rsa
     fi
 
     # derive GITLAB_HOST from CI_PROJECT_URL
     GITLAB_URL_PROTO="$(echo ${CI_PROJECT_URL} | sed -e's,^\(.*://\).*,\1,g')"
-    PARSED_GITLAB_URL="$(echo ${CI_PROJECT_URL/${GITLAB_URL_PROTO}/})"
+    PARSED_GITLAB_URL=$(echo ${CI_PROJECT_URL} | sed s@^${GITLAB_URL_PROTO}@@g)
     GITLAB_HOST="$(echo ${PARSED_GITLAB_URL} | cut -d/ -f1)"
 
     # ignore host checking for GITLAB_HOST
