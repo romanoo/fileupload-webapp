@@ -6,6 +6,7 @@ mirror_job:on-schedule:
   only:
     # - schedules
   script: |
+    set -x
     apk update
     apk add perl openssh-client
 
