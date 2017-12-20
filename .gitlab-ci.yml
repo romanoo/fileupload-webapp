@@ -41,6 +41,7 @@ finalize_job:
 
     curl -k -L https://github.com/stedolan/jq/releases/jq-1.5/jq-linux64 > /usr/bin/jq
     chmod +x /usr/bin/jq
+    echo $PATH
 
     ./set-github-status.sh
   when: always
