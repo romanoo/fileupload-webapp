@@ -24,6 +24,7 @@ init_job:
 build_job:
   stage: build
   script: |
+    echo "failing pipeline on purpose" ; exit 1
     apk update
     apk add make bash
     make NOCACHE=true docker-build
