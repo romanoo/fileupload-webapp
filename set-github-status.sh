@@ -24,15 +24,20 @@ else
         --write-out "%{http_code}\n" \
         -o gitlab-pipeline-jobs.json \
         --header "PRIVATE-TOKEN: ${PRIVATE_TOKEN}" \
-        "${GITLAB_API_URL}/projects/${PROJECT_ID}")
+        "${GITLAB_API_URL}/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/jobs")
 
   if [ "${PIPELINE_STATE_HTTP_CODE}" != "200" ] ; then
     log_msg "[ERROR] - Unexpected http_code (${PIPELINE_STATE_HTTP_CODE})" >&2
     exit 1
   fi
 
-  IS_SUCCESS=$(cat gitlab-pipeline-jobs.json | \
-    jq "[ .[] | select(.name != \"${CI_JOB_NAME}\") ] | all(.status == \"success\")")
+  IS_SUCCESS=$(cat gitlab-pipeline-jobs.json | jq "
+    map({name: .name, id: .id, status: .status})
+    | [ .[] | select(.name != \"${CI_JOB_NAME}\") ]
+    | sort_by(.id)
+    | reverse
+    | unique_by(.name)
+    | all(.status == \"success\")")
 
   if ${IS_SUCCESS} ; then
     STATE="failure"
@@ -67,5 +72,10 @@ REPORT_STATE_HTTP_CODE=$(curl \
 
 if [ "${REPORT_STATE_HTTP_CODE}" != "201" ] ; then
   log_msg "[ERROR] - Unexpected http_code (${REPORT_STATE_HTTP_CODE})" >&2
+  exit 1
+fi
+
+if ! ${IS_SUCCESS} ; then
+  log_msg "[INFO] - Failing job to force re-run on retry"
   exit 1
 fi
