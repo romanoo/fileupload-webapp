@@ -9,6 +9,7 @@
 * Jenkinsfile
 * wercker.yml
 * circle-ci
+* gitlab-ci
 
 # Build the Docker image
 
