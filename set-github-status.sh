@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 readonly SCRIPT_NAME=$(basename ${0})
 log_msg(){
