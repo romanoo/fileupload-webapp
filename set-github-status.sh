@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 readonly SCRIPT_NAME=$(basename ${0})
 log_msg(){
@@ -40,11 +40,11 @@ else
     | all(.status == \"success\")")
 
   if ${IS_SUCCESS} ; then
-    STATE="failure"
-    DESCRIPTION="Internal Gitlab pipeline failed"
-  else
     STATE="success"
     DESCRIPTION="Internal Gitlab pipeline passed"
+  else
+    STATE="failure"
+    DESCRIPTION="Internal Gitlab pipeline failed"
   fi
 fi
 
