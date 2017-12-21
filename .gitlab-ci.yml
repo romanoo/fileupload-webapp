@@ -1,0 +1,49 @@
+image: docker:17.09.1-ce-git
+
+variables:
+  GIT_SSL_NO_VERIFY: "true"
+  GITHUB_OWNER: "romain-grecourt"
+  GITHUB_REPO_NAME: "fileupload-webapp"
+
+# stages to report status to github (init -> pending, finalize  -> final status)
+stages:
+  - init
+  - build
+  - finalize
+
+init_job:
+  stage: init
+  script: |
+    apk update
+    apk add bash curl
+    ./set-github-status.sh "pending"
+  when: always
+  tags:
+    - j4c
+
+build_job:
+  stage: build
+  script: |
+    if [ -n "${SHOULD_FAIL}" ] ; then exit 1 ; fi
+    apk update
+    apk add make bash
+    make NOCACHE=true docker-build
+    make test-docker
+    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+    make docker-push IMAGE_NAME="${DOCKER_USERNAME}/fileupload-webapp:${CI_COMMIT_SHA:0:10}"
+  tags:
+    - j4c
+
+finalize_job:
+  stage: finalize
+  script: |
+    apk update
+    apk add bash curl
+
+    curl -k -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > /usr/bin/jq
+    chmod +x /usr/bin/jq
+
+    ./set-github-status.sh
+  when: always
+  tags:
+    - j4c
